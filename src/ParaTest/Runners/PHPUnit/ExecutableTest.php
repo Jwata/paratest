@@ -18,6 +18,9 @@ abstract class ExecutableTest
      * @var string
      */
     protected $temp;
+
+    protected $try_count = 0;
+
     protected $fullyQualifiedClassName;
     protected $pipes = array();
 
@@ -225,5 +228,14 @@ abstract class ExecutableTest
         }
 
         return $this->coverageFileName;
+    }
+    public function getTryCount()
+    {
+        return $this->try_count;
+    }
+
+    public function incrementTryCount()
+    {
+        return $this->try_count++;
     }
 }

@@ -82,13 +82,13 @@ class Runner
         $this->load();
         $this->printer->start($this->options);
         while (count($this->running) || count($this->pending)) {
-            foreach($this->running as $key => $test)
+            foreach($this->running as $key => $test) {
                 if (!$this->testIsStillRunning($test)) {
                     unset($this->running[$key]);
                     $this->releaseToken($key);
                 }
+            }
             $this->fillRunQueue();
-            usleep(10000);
         }
         $this->complete();
     }
@@ -216,6 +216,18 @@ class Runner
     private function testIsStillRunning($test)
     {
         if(!$test->isDoneRunning()) return true;
+
+        if (filesize($test->getTempFile()) == 0) {
+            if ($test->getTryCount() < 10) {
+
+                $test->incrementTryCount();
+                return true;
+            }
+
+            $test->stop();
+            return false;
+        }
+
         $this->setExitCode($test);
         $test->stop();
         if ($this->options->stopOnFailure && $test->getExitCode() > 0)
